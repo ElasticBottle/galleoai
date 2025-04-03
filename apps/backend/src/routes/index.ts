@@ -1,12 +1,14 @@
 import { env } from "@/lib/env";
 import { Hono } from "hono";
+import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
 
 const app = new Hono()
+  .use(contextStorage())
   .use(
     "*",
     cors({
-      origin: [env.BETTER_AUTH_URL],
+      origin: [env.VITE_FRONTEND_URL],
       allowHeaders: ["Content-Type", "Authorization"],
       allowMethods: ["POST", "GET", "OPTIONS"],
       exposeHeaders: ["Content-Length"],
@@ -14,9 +16,8 @@ const app = new Hono()
     }),
   )
   .get("/", (c) => {
-    const betterAuthUrl = env.BETTER_AUTH_URL;
     return c.json({
-      message: `Hello ${betterAuthUrl} from the backend!`,
+      message: "Hello from the backend!",
     });
   });
 

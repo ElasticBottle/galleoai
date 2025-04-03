@@ -1,7 +1,7 @@
 import { ThemeProvider as NextThemesProvider, useTheme } from "next-themes";
 import type * as React from "react";
 import * as Icons from "../components/icon";
-import { cn } from "../utils/cn";
+import { cn } from "../lib/cn";
 import { Button } from "./ui/button";
 
 export function ThemeProvider({

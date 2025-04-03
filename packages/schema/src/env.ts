@@ -13,8 +13,7 @@ export const parseClientEnv = (env: unknown) => {
 export type ClientEnv = typeof ClientEnv.infer;
 
 export const ServerEnv = type({
-  BETTER_AUTH_SECRET: "string",
-  BETTER_AUTH_URL: "string",
+  VITE_FRONTEND_URL: "string",
 });
 export const parseServerEnv = (env: unknown) => {
   const result = ServerEnv(env);
