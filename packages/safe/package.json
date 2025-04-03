@@ -19,6 +19,6 @@
   },
   "devDependencies": {
     "@rectangular-labs/typescript": "workspace:*",
-    "typescript": "catalog:"
+    "typescript": "^5.8.2"
   }
 }

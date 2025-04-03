@@ -15,6 +15,7 @@
     "with-env-prod": "dotenvx run -f ../../.env -- "
   },
   "dependencies": {
+    "@ai-sdk/react": "^1.2.5",
     "@rectangular-labs/backend": "workspace:*",
     "@rectangular-labs/schema": "workspace:*",
     "@rectangular-labs/ui": "workspace:*",

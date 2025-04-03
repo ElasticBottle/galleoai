@@ -13,7 +13,8 @@ export const parseClientEnv = (env: unknown) => {
 export type ClientEnv = typeof ClientEnv.infer;
 
 export const ServerEnv = type({
-  VITE_FRONTEND_URL: "string",
+  VITE_FRONTEND_URL: "string>0",
+  GOOGLE_GENERATIVE_AI_API_KEY: "string>0",
 });
 export const parseServerEnv = (env: unknown) => {
   const result = ServerEnv(env);

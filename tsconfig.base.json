@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "verbatimModuleSyntax": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@rectangular-labs/schema": ["packages/schema/src"],
+      "@rectangular-labs/ui": ["packages/ui/src"],
+      "@rectangular-labs/db": ["packages/db/src"],
+      "@rectangular-labs/safe": ["packages/safe/src"],
+      "@/*": ["apps/*/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", ".*.cache"]
+}

@@ -3,6 +3,7 @@ import { SparklesIcon, UserIcon } from "lucide-react";
 import React, { type ReactNode } from "react";
 import { cn } from "../../lib/cn";
 import { MarkdownContent } from "./markdown-content";
+import { FileIcon } from "../icon";
 
 const chatMessageVariants = cva("flex w-full gap-4", {
   variants: {
@@ -134,6 +135,17 @@ const ChatMessageAvatar = React.forwardRef<
 });
 ChatMessageAvatar.displayName = "ChatMessageAvatar";
 
+// Define the content part types here as well for component props
+type TextPart = { type: "text"; text: string };
+type ImagePart = { type: "image"; data: string; mimeType: string }; // Base64 data
+type FilePart = {
+  type: "file";
+  data: string; // Base64 data
+  mimeType: string;
+  name?: string; // Add optional name for display
+};
+type MessageContentPart = TextPart | ImagePart | FilePart;
+
 // Content component
 
 const chatMessageContentVariants = cva("flex flex-col gap-2", {
@@ -166,20 +178,66 @@ const chatMessageContentVariants = cva("flex flex-col gap-2", {
   },
 });
 
-interface ChatMessageContentProps extends React.HTMLAttributes<HTMLDivElement> {
+interface ChatMessageContentProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "content"> {
   id?: string;
-  content: string;
+  messageContent: string | MessageContentPart[];
 }
 
 const ChatMessageContent = React.forwardRef<
   HTMLDivElement,
   ChatMessageContentProps
->(({ className, content, id: idProp, children, ...props }, ref) => {
+>(({ className, messageContent, id: idProp, children, ...props }, ref) => {
   const context = useChatMessage();
 
   const variant = context?.variant ?? "default";
   const type = context?.type ?? "incoming";
   const id = idProp ?? context?.id ?? "";
+
+  const renderContent = () => {
+    if (typeof messageContent === "string") {
+      return messageContent.length > 0 ? (
+        <MarkdownContent id={id} content={messageContent} />
+      ) : null;
+    }
+
+    if (Array.isArray(messageContent)) {
+      return messageContent.map((part, index) => {
+        const partId = `${id}-part-${index}`;
+        switch (part.type) {
+          case "text":
+            return (
+              <MarkdownContent key={partId} id={partId} content={part.text} />
+            );
+          case "image":
+            return (
+              <img
+                key={partId}
+                src={`data:${part.mimeType};base64,${part.data}`}
+                alt="User uploaded content"
+                className="mt-2 max-w-xs rounded-md border md:max-w-md"
+              />
+            );
+          case "file":
+            return (
+              <div
+                key={partId}
+                className="mt-2 flex items-center gap-2 rounded-md border bg-muted p-2 text-sm"
+              >
+                <FileIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
+                <span className="truncate text-muted-foreground">
+                  {part.name || "Attached File"}
+                </span>
+              </div>
+            );
+          default:
+            return null;
+        }
+      });
+    }
+
+    return null;
+  };
 
   return (
     <div
@@ -187,7 +245,7 @@ const ChatMessageContent = React.forwardRef<
       className={cn(chatMessageContentVariants({ variant, type, className }))}
       {...props}
     >
-      {content.length > 0 && <MarkdownContent id={id} content={content} />}
+      {renderContent()}
       {children}
     </div>
   );

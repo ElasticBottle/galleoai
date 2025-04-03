@@ -1,17 +1,15 @@
 {
-  "extends": "@rectangular-labs/typescript/tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "target": "ESNext",
     "module": "ESNext",
     "types": ["node"],
-
-    "verbatimModuleSyntax": true,
-
+    "noEmit": false,
+    "outDir": "dist",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "vite.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }
