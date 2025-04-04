@@ -7,7 +7,7 @@ import { google } from "@ai-sdk/google";
 export const mainAgentModel = google("gemini-2.5-pro-exp-03-25");
 
 // Model for NICE classification (structured output, potentially flash for cost/speed)
-export const niceClassificationModel = google("gemini-2.5-flash-exp-03-25");
+export const niceClassificationModel = google("gemini-2.5-pro-exp-03-25");
 
 // Model for Goods & Services recommendations (structured output)
-export const goodsServicesModel = google("gemini-2.5-flash-exp-03-25");
+export const goodsServicesModel = google("gemini-2.5-pro-exp-03-25");

@@ -1,12 +1,10 @@
 import { Hono } from "hono";
-import { streamText, type CoreMessage } from "ai";
-import { mainAgentModel } from "../lib/ai/models";
-// Import tools
-import { niceClassification } from "../lib/ai/niceClassification";
-import { relevantGoodsServices } from "../lib/ai/relevantGoodsServices";
-import { markFilingRecommendation } from "../lib/ai/markFilingRecommendation";
-import { chatRequestSchema } from "@/schemas/chat";
-import { arktypeValidator } from "@hono/arktype-validator";
+import { streamText } from "ai";
+import { markFilingRecommendation } from "@/lib/ai/markFilingRecommendation";
+import { niceClassification } from "@/lib/ai/niceClassification";
+import { relevantGoodsServices } from "@/lib/ai/relevantGoodsServices";
+import { mainAgentModel } from "@/lib/ai/models";
+import { stream } from "hono/streaming";
 
 // Define the system prompt
 const systemPrompt = `You are an expert Singapore trademark law assistant working for a prestigious law firm.
@@ -24,42 +22,50 @@ Do not provide definitive legal advice, but rather informed recommendations base
 Use markdown for formatting the email draft.`;
 
 // Define the POST route for chat requests
-const chat = new Hono().post(
-  "/",
-  arktypeValidator("json", chatRequestSchema),
-  async (c) => {
-    // const { messages } = c.req.valid("json");
-    console.log("c.req", c.req);
+const chat = new Hono().post("/", async (c) => {
+  // const { messages } = c.req.valid("json");
+  const messages = await c.req.json();
+  console.log("messages", messages);
 
-    // Define and import actual tools
-    const tools = {
-      niceClassification: niceClassification,
-      relevantGoodsServices: relevantGoodsServices,
-      markFilingRecommendation: markFilingRecommendation,
-    };
+  // Define and import actual tools
+  const tools = {
+    niceClassification: niceClassification,
+    relevantGoodsServices: relevantGoodsServices,
+    markFilingRecommendation: markFilingRecommendation,
+  };
 
-    try {
-      const result = await streamText({
-        model: mainAgentModel, // Use the main agent model
-        system: systemPrompt,
-        messages: [] as CoreMessage[], // Pass validated messages (includes multimodal content)
-        tools: tools,
-        // Enable Google Search grounding
-        experimental_providerMetadata: {
-          google: {
-            useSearchGrounding: true,
-          },
+  try {
+    const result = streamText({
+      model: mainAgentModel, // Use the main agent model
+      system: systemPrompt,
+      messages: messages.messages,
+      tools: tools,
+      // Enable Google Search grounding
+      experimental_providerMetadata: {
+        google: {
+          useSearchGrounding: true,
         },
-      });
+      },
+      onFinish: (result) => {
+        console.log("result", result);
+      },
+      onError: (error) => {
+        console.error("Error calling streamText:", error);
+      },
+    });
 
-      // Respond with the streaming data response
-      return result.toDataStreamResponse();
-    } catch (error) {
-      console.error("Error calling streamText:", error);
-      // Consider returning a more informative error response
-      return c.json({ error: "Failed to process chat request" }, 500);
-    }
-  },
-);
+    const dataStream = result.toDataStream();
+    return stream(c, async (stream) => {
+      stream.onAbort(() => {
+        console.log("Stream aborted!");
+      });
+      await stream.pipe(dataStream);
+    });
+  } catch (error) {
+    console.error("Error calling streamText:", error);
+    // Consider returning a more informative error response
+    return c.json({ error: "Failed to process chat request" }, 500);
+  }
+});
 
 export default chat;

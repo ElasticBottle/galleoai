@@ -1,4 +1,4 @@
-import { tool, generateObject } from "ai";
+import { tool, generateObject, jsonSchema } from "ai";
 import { type } from "arktype";
 import { mainAgentModel } from "./models"; // Use main model for potentially more complex reasoning
 
@@ -30,7 +30,9 @@ const outputSchema = type({
 export const markFilingRecommendation = tool({
   description:
     "Provides actionable recommendations for trademark filing based on the analyzed background, classifications, and relevant goods/services.",
-  parameters: paramsSchema.toJsonSchema() as unknown as any,
+  parameters: jsonSchema<typeof paramsSchema.infer>(
+    paramsSchema.toJsonSchema(),
+  ),
   execute: async ({ backgroundInfo, classifications, relevantServices }) => {
     console.log("Executing markFilingRecommendation tool...");
 
@@ -45,7 +47,9 @@ export const markFilingRecommendation = tool({
     try {
       const { object } = await generateObject({
         model: mainAgentModel, // Use a powerful model for nuanced recommendations
-        schema: outputSchema.toJsonSchema() as unknown as any,
+        schema: jsonSchema<typeof outputSchema.infer>(
+          outputSchema.toJsonSchema(),
+        ),
         prompt: `Given the following business background, NICE classifications, and identified goods/services, provide actionable recommendations for a Singapore trademark filing.
 
         Business Background:

@@ -80,9 +80,10 @@ function ChatInterface() {
     setMessages,
     stop,
   } = useChat({
-    api: backend.api.chat.$url().href, // Ensure this matches the backend route
-    // We'll handle submission manually to include files
-    // Send base64 files in body under a specific key
+    api: backend.api.chat.$url().href,
+    onToolCall({ toolCall }) {
+      console.log("toolCall", toolCall);
+    },
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

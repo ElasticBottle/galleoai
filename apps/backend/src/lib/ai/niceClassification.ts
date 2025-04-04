@@ -1,7 +1,7 @@
 import { type } from "arktype";
-import { tool, generateObject } from "ai";
+import { tool, generateObject, jsonSchema } from "ai";
 import { niceClassificationModel } from "./models";
-import { niceClassificationData } from "./niceData"; // Import the classification data
+import { niceClassificationData } from "./niceData";
 
 // Define the input schema for the tool using ArkType
 const paramsSchema = type({
@@ -27,8 +27,9 @@ const niceDataPromptSection = niceClassificationData
 export const niceClassification = tool({
   description:
     "Classifies a business activity based on background information according to the official NICE classification system. Provides relevant class numbers and reasoning.",
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  parameters: paramsSchema.toJsonSchema() as unknown as any,
+  parameters: jsonSchema<typeof paramsSchema.infer>(
+    paramsSchema.toJsonSchema(),
+  ),
   execute: async ({ backgroundInfo }) => {
     console.log(
       `Executing niceClassification tool with background: ${backgroundInfo.substring(0, 100)}...`,
@@ -36,8 +37,9 @@ export const niceClassification = tool({
     try {
       const { object } = await generateObject({
         model: niceClassificationModel, // Use the dedicated model
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-        schema: outputSchema.toJsonSchema() as unknown as any,
+        schema: jsonSchema<typeof outputSchema.infer>(
+          outputSchema.toJsonSchema(),
+        ),
         prompt: `Analyze the following business background information and determine the most relevant NICE classification(s).
         
         Background Information:

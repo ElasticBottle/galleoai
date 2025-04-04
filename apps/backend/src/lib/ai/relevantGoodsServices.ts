@@ -1,5 +1,5 @@
 import { type } from "arktype";
-import { tool, generateObject } from "ai";
+import { tool, generateObject, jsonSchema } from "ai";
 import { goodsServicesModel } from "./models";
 
 // --- MOCK DATA --- (Replace with actual data source: API, DB, etc.)
@@ -62,7 +62,9 @@ const outputSchema = type({
 export const relevantGoodsServices = tool({
   description:
     "Suggests relevant goods and services from the Singapore preapproved list based on provided NICE classifications and business background.",
-  parameters: paramsSchema.toJsonSchema() as unknown as any,
+  parameters: jsonSchema<typeof paramsSchema.infer>(
+    paramsSchema.toJsonSchema(),
+  ),
   execute: async ({ classifications, backgroundInfo }) => {
     console.log("Executing relevantGoodsServices tool...");
     console.log("Classifications:", classifications);
@@ -103,7 +105,9 @@ export const relevantGoodsServices = tool({
     try {
       const { object } = await generateObject({
         model: goodsServicesModel,
-        schema: outputSchema.toJsonSchema() as unknown as any,
+        schema: jsonSchema<typeof outputSchema.infer>(
+          outputSchema.toJsonSchema(),
+        ),
         prompt: `Based on the following business background information, the suggested NICE classifications, and the provided examples from the Singapore preapproved list, identify and list the *most relevant* specific goods and services that should be included in a trademark application. 
 
         Business Background:

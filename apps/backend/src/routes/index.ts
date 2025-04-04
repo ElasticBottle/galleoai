@@ -10,7 +10,7 @@ const app = new Hono()
     "*",
     cors({
       origin: () => {
-        return env.VITE_FRONTEND_URL;
+        return env().VITE_FRONTEND_URL;
       },
       allowHeaders: ["Content-Type", "Authorization"],
       allowMethods: ["POST", "GET", "OPTIONS"],
