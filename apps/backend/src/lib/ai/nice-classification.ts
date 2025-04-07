@@ -1,7 +1,7 @@
 import { type } from "arktype";
 import { tool, generateObject, jsonSchema } from "ai";
 import { niceClassificationModel } from "./models";
-import { niceClassificationData } from "./niceData";
+import { niceClassificationData } from "./nice-data";
 
 // Define the input schema for the tool using ArkType
 const paramsSchema = type({

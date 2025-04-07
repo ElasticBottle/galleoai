@@ -70,6 +70,7 @@ function ChatInterface() {
 
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
 
   const {
     messages,
@@ -179,51 +180,37 @@ function ChatInterface() {
     });
   };
 
-  // Helper function to extract text content for display
-  const getTextContent = (content: string | MessageContentPart[]): string => {
-    if (typeof content === "string") {
-      return content;
-    }
-    const textPart = content.find((part) => part.type === "text") as
-      | TextPart
-      | undefined;
-    return textPart?.text || ""; // Return text or empty string if no text part
-  };
-
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex h-screen flex-col">
       <ThemeToggle className="absolute top-4 right-4 z-10" />
-      <ChatMessageArea className="flex-1 p-4 pb-20">
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 py-5">
-          {messages.map((message) => (
-            <ChatMessage
-              key={message.id}
-              type={message.role === "user" ? "outgoing" : "incoming"}
-              id={message.id}
-            >
-              <ChatMessageAvatar />
-              <ChatMessageContent
+      <div className="flex-1">
+        <ChatMessageArea>
+          <div className="mx-auto flex max-h-[85vh] w-full max-w-3xl flex-col gap-4 pt-5">
+            {messages.map((message) => (
+              <ChatMessage
+                key={message.id}
+                type={message.role === "user" ? "outgoing" : "incoming"}
+                variant="full"
                 id={message.id}
-                // Pass the actual content structure to the renamed prop
-                messageContent={
-                  message.content as string | MessageContentPart[]
-                }
-              />
-              {/* TODO: Enhance ChatMessageContent to render non-text parts */}
-            </ChatMessage>
-          ))}
-          {isLoading && (
-            <ChatMessage type="incoming" id="typing">
-              <ChatMessageAvatar />
-              <TypingIndicator />
-            </ChatMessage>
-          )}
-        </div>
-      </ChatMessageArea>
+              >
+                <ChatMessageAvatar />
+                <ChatMessageContent
+                  id={message.id}
+                  messageContent={message.content}
+                />
+              </ChatMessage>
+            ))}
+            {isLoading && (
+              <ChatMessage type="incoming" id="typing" variant="full">
+                <TypingIndicator />
+              </ChatMessage>
+            )}
+          </div>
+        </ChatMessageArea>
+      </div>
 
-      <div className="fixed right-0 bottom-0 left-0 flex justify-center border-t bg-background p-4 backdrop-blur-sm">
-        <form onSubmit={handleFormSubmit} className="relative w-full max-w-3xl">
-          {/* Hidden File Input */}
+      <div className="flex w-full justify-center p-2" ref={chatRef}>
+        <form onSubmit={handleFormSubmit} className=" w-full max-w-3xl">
           <input
             type="file"
             multiple
@@ -235,14 +222,12 @@ function ChatInterface() {
 
           {/* File Previews */}
           {attachedFiles.length > 0 && (
-            <div className="mb-2 flex flex-wrap gap-2">
-              {attachedFiles.map((file) => (
+            <div className="flex max-h-20 flex-wrap gap-2 overflow-y-auto pb-2">
+              {attachedFiles.map((file, index) => (
                 <FilePreview
                   key={`${file.name}-${file.lastModified}`}
                   file={file}
-                  onRemove={() =>
-                    removeFile(attachedFiles.findIndex((f) => f === file))
-                  }
+                  onRemove={() => removeFile(index)}
                 />
               ))}
             </div>
@@ -255,32 +240,24 @@ function ChatInterface() {
             loading={isLoading}
             onSubmit={handleSubmit}
             onStop={stop}
-            variant="default" // Use the default styled input
+            variant="default"
+            rows={1}
+            className="space-y-2"
           >
-            {/* Attach Button */}
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="absolute bottom-2 left-2 h-8 w-8 shrink-0 rounded-full"
-              onClick={triggerFileInput}
-              disabled={isLoading || attachedFiles.length >= 5}
-            >
-              <Paperclip className="h-4 w-4" />
-            </Button>
-
-            {/* Text Area (adjust padding for button) */}
-            <ChatInputTextArea
-              placeholder="Ask about Singapore trademark registration..."
-              className="pr-14 pl-12" // Make space for buttons
-              rows={1}
-            />
-
-            {/* Submit Button */}
-            <ChatInputSubmit
-              type="submit"
-              className="absolute right-2 bottom-2"
-            />
+            <ChatInputTextArea placeholder="Ask about Singapore trademark registration..." />
+            <div className="flex w-full justify-between">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                // className="absolute bottom-2 left-2 h-8 w-8 shrink-0 rounded-full"
+                onClick={triggerFileInput}
+                disabled={isLoading || attachedFiles.length >= 5}
+              >
+                <Paperclip className="h-4 w-4" />
+              </Button>
+              <ChatInputSubmit type="submit" className="rounded-full" />
+            </div>
           </ChatInput>
         </form>
       </div>

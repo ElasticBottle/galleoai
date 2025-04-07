@@ -1,9 +1,9 @@
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
 import { cn } from "../../lib/cn";
 import { Button } from "../ui/button";
 import { useScrollToBottom } from "../../hooks/use-scroll-to-bottom";
+import { ScrollArea } from "../ui/scroll-area";
 
 type ScrollButtonAlignment = "left" | "center" | "right";
 
@@ -55,7 +55,7 @@ export function ChatMessageArea({
     useScrollToBottom<HTMLDivElement>();
 
   return (
-    <ScrollArea className="relative flex-1">
+    <ScrollArea className="relative">
       <div ref={containerRef}>
         <div className={cn(className, "min-h-0")}>{children}</div>
       </div>

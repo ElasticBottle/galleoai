@@ -65,9 +65,11 @@ export const relevantGoodsServices = tool({
   parameters: jsonSchema<typeof paramsSchema.infer>(
     paramsSchema.toJsonSchema(),
   ),
-  execute: async ({ classifications, backgroundInfo }) => {
+  execute: async ({ classifications, backgroundInfo }, { messages }) => {
     console.log("Executing relevantGoodsServices tool...");
     console.log("Classifications:", classifications);
+
+    console.log("messages", messages);
 
     if (!classifications || classifications.length === 0) {
       console.log("No classifications provided.");
